@@ -92,15 +92,16 @@ def generate_with_ollama(model: str, prompt: str) -> Tuple[str, float, int, int]
         raise RuntimeError(f"Ollama API error: {e}")
 
 
-def combination_exists(model: str, text_id: str, run: int, csv_path: str) -> bool:
-    """Check if (model, text_id, run) already exists in CSV."""
+def combination_exists(model: str, text_id: str, run: int, strategy: str, csv_path: str) -> bool:
+    """Check if (model, text_id, run, strategy) already exists in CSV."""
     if not os.path.exists(csv_path):
         return False
 
     with open(csv_path, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row['model'] == model and row['text_id'] == text_id and int(row['run']) == run:
+            if (row['model'] == model and row['text_id'] == text_id and
+                int(row['run']) == run and row.get('strategy', 'zero-shot') == strategy):
                 return True
 
     return False
@@ -111,26 +112,27 @@ def write_csv_header(csv_path: str):
     if not os.path.exists(csv_path):
         with open(csv_path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=[
-                'model', 'text_id', 'run', 'output', 'seconds',
+                'model', 'text_id', 'run', 'strategy', 'output', 'seconds',
                 'prompt_tokens', 'completion_tokens', 'timestamp'
             ])
             writer.writeheader()
 
 
-def append_result(csv_path: str, model: str, text_id: str, run: int,
+def append_result(csv_path: str, model: str, text_id: str, run: int, strategy: str,
                   output: str, seconds: float, prompt_tokens: int, completion_tokens: int):
     """Append a single result to the CSV."""
     timestamp = datetime.utcnow().isoformat()
 
     with open(csv_path, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=[
-            'model', 'text_id', 'run', 'output', 'seconds',
+            'model', 'text_id', 'run', 'strategy', 'output', 'seconds',
             'prompt_tokens', 'completion_tokens', 'timestamp'
         ])
         writer.writerow({
             'model': model,
             'text_id': text_id,
             'run': run,
+            'strategy': strategy,
             'output': output,
             'seconds': f"{seconds:.2f}",
             'prompt_tokens': prompt_tokens,
@@ -160,8 +162,9 @@ def run_experiments(pilot: bool = False):
     print(f"\n{'='*60}")
     print(f"Starting {mode} experiment run")
     print(f"{'='*60}")
-    print(f"Texts: {len(texts)}, Models: {len(config.MODELS)}, Runs per combo: {num_runs}")
-    print(f"Total generations: {len(texts) * len(config.MODELS) * num_runs}")
+    print(f"Texts: {len(texts)}, Models: {len(config.MODELS)}, Strategies: {len(config.PROMPT_STRATEGIES_TO_USE)}, Runs: {num_runs}")
+    print(f"Total generations: {len(texts) * len(config.MODELS) * len(config.PROMPT_STRATEGIES_TO_USE) * num_runs}")
+    print(f"Strategies: {', '.join(config.PROMPT_STRATEGIES_TO_USE)}")
     print(f"Output CSV: {config.RAW_OUTPUTS_CSV}")
     print(f"{'='*60}\n")
 
@@ -181,45 +184,46 @@ def run_experiments(pilot: bool = False):
         model_start = time.time()
 
         for text_id, source_text in texts.items():
-            for run_num in range(1, num_runs + 1):
-                # Check if already done
-                if combination_exists(model, text_id, run_num, config.RAW_OUTPUTS_CSV):
-                    skipped += 1
-                    print(f"  ✓ {model} / {text_id} / run {run_num} (cached, skipping)")
-                    continue
+            for strategy in config.PROMPT_STRATEGIES_TO_USE:
+                for run_num in range(1, num_runs + 1):
+                    # Check if already done
+                    if combination_exists(model, text_id, run_num, strategy, config.RAW_OUTPUTS_CSV):
+                        skipped += 1
+                        print(f"  ✓ {model} / {text_id} / {strategy} / run {run_num} (cached)")
+                        continue
 
-                prompt = config.PROMPT_TEMPLATE.format(text=source_text)
+                    prompt = config.PROMPTING_STRATEGIES[strategy].format(text=source_text)
 
-                try:
-                    print(f"  Generating {model} / {text_id} / run {run_num}...", end='', flush=True)
-                    output, elapsed, prompt_tokens, completion_tokens = generate_with_ollama(model, prompt)
-
-                    append_result(
-                        config.RAW_OUTPUTS_CSV,
-                        model, text_id, run_num,
-                        output, elapsed, prompt_tokens, completion_tokens
-                    )
-
-                    print(f" ✓ {elapsed:.1f}s ({completion_tokens} tokens)")
-                    processed += 1
-
-                except Exception as e:
-                    print(f" ✗ ERROR: {e}")
-                    failed += 1
-                    # Retry once
                     try:
-                        print(f"    Retrying...", end='', flush=True)
+                        print(f"  {model} / {text_id} / {strategy} / run {run_num}...", end='', flush=True)
                         output, elapsed, prompt_tokens, completion_tokens = generate_with_ollama(model, prompt)
+
                         append_result(
                             config.RAW_OUTPUTS_CSV,
-                            model, text_id, run_num,
+                            model, text_id, run_num, strategy,
                             output, elapsed, prompt_tokens, completion_tokens
                         )
-                        print(f" ✓ {elapsed:.1f}s ({completion_tokens} tokens)")
+
+                        print(f" ✓ {elapsed:.1f}s")
                         processed += 1
-                        failed -= 1
-                    except Exception as e2:
-                        print(f" ✗ FAILED: {e2}")
+
+                    except Exception as e:
+                        print(f" ✗ ERROR: {e}")
+                        failed += 1
+                        # Retry once
+                        try:
+                            print(f"    Retrying...", end='', flush=True)
+                            output, elapsed, prompt_tokens, completion_tokens = generate_with_ollama(model, prompt)
+                            append_result(
+                                config.RAW_OUTPUTS_CSV,
+                                model, text_id, run_num, strategy,
+                                output, elapsed, prompt_tokens, completion_tokens
+                            )
+                            print(f" ✓ {elapsed:.1f}s")
+                            processed += 1
+                            failed -= 1
+                        except Exception as e2:
+                            print(f" ✗ FAILED: {e2}")
 
         model_elapsed = time.time() - model_start
         print(f"  Model {model} took {model_elapsed:.1f}s")
