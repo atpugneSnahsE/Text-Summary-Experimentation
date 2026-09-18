@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific: keep raw_outputs.csv during runs, but ignore intermediate files
+results/metrics.csv
+results/summary_table.csv
+results/examples.md
+figures/
+docs/
+
+# Cache
+.cache/
+*.cache
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Keep source data, but ignore processed results
+!data/
+!data/texts/
+!data/facts.json
+!data/references/
