@@ -1,0 +1,96 @@
+{
+  "text1": [
+    {
+      "name": "placeholder",
+      "keywords": ["autonomous", "vehicle"]
+    }
+  ],
+  "text2": [
+    {
+      "name": "AI spending 2023",
+      "keywords": ["$100 billion", "100 billion", "2023"]
+    },
+    {
+      "name": "AI growth rate",
+      "keywords": ["38 percent", "38%", "growth"]
+    },
+    {
+      "name": "US and China leadership",
+      "keywords": ["United States", "China", "60 percent", "60%"]
+    },
+    {
+      "name": "EU AI Act",
+      "keywords": ["European Union", "AI Act", "regulation"]
+    },
+    {
+      "name": "AI contribution to GDP by 2030",
+      "keywords": ["2030", "15 percent", "15%", "GDP"]
+    }
+  ],
+  "text3": [
+    {
+      "name": "Traditional vaccine development time",
+      "keywords": ["10 to 15 years", "10-15 years"]
+    },
+    {
+      "name": "mRNA vaccine development time",
+      "keywords": ["under one year", "less than one year", "2020"]
+    },
+    {
+      "name": "Vaccine distribution inequality high-income",
+      "keywords": ["80 percent", "80%", "high-income"]
+    },
+    {
+      "name": "Vaccine distribution inequality low-income",
+      "keywords": ["5 percent", "5%", "low-income"]
+    },
+    {
+      "name": "GAVI funding needs",
+      "keywords": ["2 billion", "GAVI", "annually"]
+    }
+  ],
+  "text4": [
+    {
+      "name": "Container shipping pre-2020",
+      "keywords": ["1,500", "1500", "container"]
+    },
+    {
+      "name": "Container shipping peak 2021",
+      "keywords": ["10,000", "10000", "2021"]
+    },
+    {
+      "name": "Taiwan semiconductor market share",
+      "keywords": ["65 percent", "65%", "Taiwan"]
+    },
+    {
+      "name": "Taiwan advanced chips",
+      "keywords": ["90 percent", "90%", "advanced"]
+    },
+    {
+      "name": "US CHIPS Act funding",
+      "keywords": ["39 billion", "$39 billion", "CHIPS Act"]
+    }
+  ],
+  "text5": [
+    {
+      "name": "Ocean pH decrease",
+      "keywords": ["0.1", "pH", "decrease"]
+    },
+    {
+      "name": "pH increase as acidity",
+      "keywords": ["30 percent", "30%", "acidity"]
+    },
+    {
+      "name": "Great Barrier Reef bleaching events",
+      "keywords": ["four", "8 years", "bleaching"]
+    },
+    {
+      "name": "Coral reef timeline",
+      "keywords": ["2050", "functioning ecosystem"]
+    },
+    {
+      "name": "Renewable energy share",
+      "keywords": ["12 percent", "12%", "wind", "solar"]
+    }
+  ]
+}
