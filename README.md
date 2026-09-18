@@ -180,30 +180,8 @@ hw1/
 3. **Immediate CSV append** per output (resume-safe if interrupted)
 4. **Non-parametric stats** (Kruskal-Wallis) because metric scores are not normally distributed
 5. **No system prompt** – tests raw model behavior on a simple task
-6. **Temperature 0.7** – ensures run-to-run variation is real, justifying 10 repetitions
-
-## Limitations to Acknowledge in Report
-
-- Small quantized models on CPU → results don't generalize to large commercial models (ChatGPT, Gemini, Claude)
-- Model size differs (2B vs 3.8B) → size is a confound; discuss or group by size
-- Surface metrics don't measure truthfulness; key-fact regex can miss valid paraphrases → manually sample-check ~20 outputs
-- English text only, summarization task only, 5 source texts
-- Temperature 0.7 means results vary per run (why 10 repetitions are needed)
-- Human-written references (if used for ROUGE) are subjective
-
-## Video Outline (7 minutes)
-
-0:00–0:45  | Objective + feedback addressed  
-0:45–1:45  | Experiment plan diagram; constants vs. one variable (model)  
-1:45–2:45  | Setup: Ollama, models, parameters  
-2:45–5:15  | Results: 3–4 figures + qualitative example  
-5:15–6:15  | Limitations  
-6:15–7:00  | Clear recommendations with evidence (metric + value per recommendation)  
+6. **Temperature 0.7** – ensures run-to-run variation is real, justifying 10 repetitions  
 
 ## References
 
 Saini, M., & Sengupta, E. (2024). "Artificial intelligence inspired fog-cloud-based visual-assistance framework for blind and visually-impaired people." *Multimedia Tools and Applications*. DOI: 10.1007/s11042-024-20159-1
-
-## Contact
-
-Questions about setup? Check Ollama docs: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
